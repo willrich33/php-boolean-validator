@@ -32,7 +32,7 @@ $boolean_test_array[] = "test1 & test2";
 $boolean_test_array[] = "test1 | & test2";
 $boolean_test_array[] = "&";
 
-echo "<p>PHP BOOLEAN PARSER</p>";
+echo "<p>PHP BOOLEAN PARSER TEST</p>";
 echo "<table border=1><tr><td>Boolean String</td><td>Error Message</td></tr>";
 foreach ($boolean_test_array as $boolean_string)
 	{
