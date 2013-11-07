@@ -123,20 +123,17 @@ function token(&$tokens, $next ,$i, &$n, &$message)
     if (advance("/[^&!\|\(\)]/", $next, $i, $tokens))
         {
 	//pointer is a token
-        operator($tokens, $next ,$i, $n, $message);
-        return true;  
+        operator($tokens, $next ,$i, $n, $message); 
         }
     elseif (advance("/!{1}/", $next, $i, $tokens))
         {
 	//pointer is a NOT
-        token($tokens, $next ,$i, $n, $message);
-        return true;    
+        token($tokens, $next ,$i, $n, $message);   
         }
     else
         {
 	//error found
         $message = "Error in boolean expression at token " . ($i + 1) . " near " . $next;
-        return false;
         }
     }
     
@@ -148,26 +145,22 @@ function open(&$tokens,$next,$i,&$n, &$message)
 	//pointer is open parenthesis
         $n++;    
         open($tokens, $next ,$i, $n, $message);
-        return true;
         }
     elseif (advance("/!{1}/", $next, $i, $tokens))
         {
 	//pointer is a NOT
         open($tokens, $next ,$i, $n, $message);
-        return true;
         }    
     elseif (advance("/[^&!\|\(\)]/", $next, $i, $tokens))
         {
 	//pointer is a token
         operator($tokens, $next ,$i, $n, $message);
-        return true;
         }
     else
         {
 	//error found
         $token = empty($tokens[$i-1]) ? $next : $tokens[$i-1];
         $message = "Error in boolean expression at token " . ($i + 1) . " near " . $next;
-        return false;
         }
     }
     
@@ -178,34 +171,29 @@ function operator(&$tokens,$next,$i,&$n,&$message)
         {
 	//pointer is an AND, OR or NOT
         open($tokens, $next ,$i, $n, $message);
-        return true;
         }
     elseif (advance("/\){1}/", $next, $i, $tokens))
         {
 	//pointer is a closed parenthesis
         $n--;
         operator($tokens, $next ,$i, $n, $message);
-        return true;
         }
     elseif (advance("/[^&!\|\(\)]/", $next, $i, $tokens))
         {
 	//pointer is a token
         array_splice($tokens,$i-1,0,"|"); //put an OR between two tokens
         $i++;
-        operator($tokens, $next ,$i, $n, $message);
-        return true;    
+        operator($tokens, $next ,$i, $n, $message);   
         }
     elseif (empty($next))
         {
 	//end of descent, no errors
-        $message = false;
-        return false;    
+        $message = false;  
         } 
     else
         {
 	//error found
         $message = "Error in boolean expression at token " . ($i + 1) . " near " . $next;
-        return false;
         }
     } //end function
 ?>
