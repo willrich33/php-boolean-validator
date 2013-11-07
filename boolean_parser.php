@@ -32,7 +32,7 @@ $boolean_test_array[] = "test1 & test2";
 $boolean_test_array[] = "test1 | & test2";
 $boolean_test_array[] = "&";
 
-echo "<p>PHP BOOLEAN PARSER TEST</p>";
+echo "<p>PHP BOOLEAN PARSER</p>";
 echo "<table border=1><tr><td>Boolean String</td><td>Error Message</td></tr>";
 foreach ($boolean_test_array as $boolean_string)
 	{
@@ -71,11 +71,11 @@ function parse_boolean_string(&$boolean_string) {
         //message and tokens passed by value
         if ($next == "(") //open parentheses
             {
-            $return = (int)open($tokens,$next,$i,$n,$message);
+            open($tokens,$next,$i,$n,$message);
             }
         else //token or boolean not (!)
             {
-            $return = (int)token($tokens,$next,$i,$n,$message);    
+            token($tokens,$next,$i,$n,$message);    
             }
         
         /* RETURN VALUES */       
