@@ -48,10 +48,10 @@ function parse_boolean_string(&$boolean_string) {
 	
     /* MAIN FUNCTION */    	
     if (trim($boolean_string) == "") 
-		{
-		//error on empty string
-		return "Enter Search Terms or Tokens";
-		}
+	{
+	//error on empty string
+	return "Enter Search Terms or Tokens";
+	}
     else
         {
         //split up tokens
