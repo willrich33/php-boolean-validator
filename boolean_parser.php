@@ -31,6 +31,7 @@ $boolean_test_array[] = "(test1 & test2) !& test3";
 $boolean_test_array[] = "test1 & test2";
 $boolean_test_array[] = "test1 | & test2";
 $boolean_test_array[] = "&";
+$boolean_test_array[] = "Test1 & !test2)";
 
 echo "<p>PHP BOOLEAN PARSER</p>";
 echo "<table border=1><tr><td>Boolean String</td><td>Error Message</td></tr>";
@@ -159,7 +160,6 @@ function open(&$tokens,$next,$i,&$n, &$message)
     else
         {
 	//error found
-        $token = empty($tokens[$i-1]) ? $next : $tokens[$i-1];
         $message = "Error in boolean expression at token " . ($i + 1) . " near " . $next;
         }
     }
