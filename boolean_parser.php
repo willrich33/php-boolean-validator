@@ -58,7 +58,7 @@ function parse_boolean_string(&$boolean_string) {
 		//purge unwanted chars
 		$boolean_string = str_replace(array("\r","\n","\t"), "", $boolean_string);
 		//split up tokens and operators
-		$tokens= preg_split('/([\|&!\)\(\s])/', $boolean_string, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+		$tokens = preg_split('/([\|&!\)\(\s])/', $boolean_string, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 		//get rid of space tokens
 		$tokens = array_diff($tokens, array(" "));
 		//re-increment array
