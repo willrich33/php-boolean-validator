@@ -49,18 +49,22 @@ function parse_boolean_string(&$boolean_string) {
 	
     /* MAIN FUNCTION */    	
     if (trim($boolean_string) == "") 
-	{
-	//error on empty string
-	return "Enter Search Terms or Tokens";
-	}
+		{
+		//error on empty string
+		return "Enter Search Terms or Tokens";
+		}
     else
         {
-        //split up tokens
+	//purge unwanted chars
+		$boolean_string = str_replace(array("\r","\n","\t"), "", $boolean_string);
+    //split up tokens and operators
         $tokens= preg_split('/([\|&!\)\(\s])/', $boolean_string, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 	//get rid of space tokens
         $tokens = array_diff($tokens, array(" "));
 	//re-increment array
         $tokens = array_merge($tokens);
+	//use new line as eol
+		array_push($tokens, "\n");
         
         //initial values
         $i = 0;
@@ -92,8 +96,8 @@ function parse_boolean_string(&$boolean_string) {
         
         else //good boolean expression
             {
-	    //$boolean_string passed as a value
-            $boolean_string = implode($tokens);
+	    //$boolean_string passed as a value, trim off new line
+            $boolean_string = trim(implode($tokens));
             return false;                     
             }        
         }    
@@ -121,7 +125,7 @@ function advance($regex, &$next, &$i, $tokens)
 function token(&$tokens, $next ,$i, &$n, &$message)
     {
     //comes from a NOT
-    if (advance("/[^&!\|\(\)]/", $next, $i, $tokens))
+    if (advance("/[^&!\|\(\)\\n]/", $next, $i, $tokens))
         {
 	//pointer is a token
         operator($tokens, $next ,$i, $n, $message); 
@@ -152,7 +156,7 @@ function open(&$tokens,$next,$i,&$n, &$message)
 	//pointer is a NOT
         open($tokens, $next ,$i, $n, $message);
         }    
-    elseif (advance("/[^&!\|\(\)]/", $next, $i, $tokens))
+    elseif (advance("/[^&!\|\(\)\\n]/", $next, $i, $tokens))
         {
 	//pointer is a token
         operator($tokens, $next ,$i, $n, $message);
@@ -178,14 +182,14 @@ function operator(&$tokens,$next,$i,&$n,&$message)
         $n--;
         operator($tokens, $next ,$i, $n, $message);
         }
-    elseif (advance("/[^&!\|\(\)]/", $next, $i, $tokens))
+    elseif (advance("/[^&!\|\(\)\\n]/", $next, $i, $tokens))
         {
 	//pointer is a token
         array_splice($tokens,$i-1,0,"|"); //put an OR between two tokens
         $i++;
         operator($tokens, $next ,$i, $n, $message);   
         }
-    elseif (empty($next))
+    elseif ($next == "\n")
         {
 	//end of descent, no errors
         $message = false;  
