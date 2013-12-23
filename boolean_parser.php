@@ -46,158 +46,158 @@ echo "</table>";
 ?>
 <?php
 function parse_boolean_string(&$boolean_string) {
-	
-    /* MAIN FUNCTION */    	
-    if (trim($boolean_string) == "") 
+
+	/* MAIN FUNCTION */
+	if (trim($boolean_string) == "") 
 		{
 		//error on empty string
 		return "Enter Search Terms or Tokens";
 		}
-    else
-        {
-	//purge unwanted chars
+	else
+		{
+		//purge unwanted chars
 		$boolean_string = str_replace(array("\r","\n","\t"), "", $boolean_string);
-    //split up tokens and operators
-        $tokens= preg_split('/([\|&!\)\(\s])/', $boolean_string, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-	//get rid of space tokens
-        $tokens = array_diff($tokens, array(" "));
-	//re-increment array
-        $tokens = array_merge($tokens);
-	//use new line as eol
+		//split up tokens and operators
+		$tokens= preg_split('/([\|&!\)\(\s])/', $boolean_string, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+		//get rid of space tokens
+		$tokens = array_diff($tokens, array(" "));
+		//re-increment array
+		$tokens = array_merge($tokens);
+		//use new line as eol
 		array_push($tokens, "\n");
-        
-        //initial values
-        $i = 0;
-        $n = 0;
-        $next = $tokens[$i];
-        $message = false;
-        
-        /* ENTRANCE TO RECURSIVE DESCENT PARSER */
-        //message and tokens passed by value
-        if ($next == "(") //open parentheses
-            {
-            open($tokens,$next,$i,$n,$message);
-            }
-        else //token or boolean not (!)
-            {
-            token($tokens,$next,$i,$n,$message);    
-            }
-        
-        /* RETURN VALUES */       
-        if ($message) //error in boolean expression
-            {
-            return $message;       
-            }
 		
-        elseif ($n <> 0) //unbalanced parentheses
-            {
-            return "Search term(s) have unbalanced parenthesis";    
-            }        
-        
-        else //good boolean expression
-            {
-	    //$boolean_string passed as a value, trim off new line
-            $boolean_string = trim(implode($tokens));
-            return false;                     
-            }        
-        }    
-    }
-    /* END MAIN FUNCTION */
+		//initial values
+		$i = 0;
+		$n = 0;
+		$next = $tokens[$i];
+		$message = false;
+		
+		/* ENTRANCE TO RECURSIVE DESCENT PARSER */
+		//message and tokens passed by value
+		if ($next == "(") //open parentheses
+			{
+			open($tokens,$next,$i,$n,$message);
+			}
+		else //token or boolean not (!)
+			{
+			token($tokens,$next,$i,$n,$message);
+			}
+		
+		/* RETURN VALUES */
+		if ($message) //error in boolean expression
+			{
+			return $message;
+			}
+		
+		elseif ($n <> 0) //unbalanced parentheses
+			{
+			return "Search term(s) have unbalanced parenthesis";
+			}
+		
+		else //good boolean expression
+			{
+			//$boolean_string passed as a value, trim off new line
+			$boolean_string = trim(implode($tokens));
+			return false;
+			}
+		}
+	}
+	/* END MAIN FUNCTION */
 
 
 /* RECURSIVE DESCENT PARSING FUNCTIONS */
 //also checks for balanced parentheses and adds ORs between search toekns
 function advance($regex, &$next, &$i, $tokens)
-    {
-    //check condition and advance pointer
-    if (preg_match($regex, $next))
-        {
-        $i++;
-        $next = $tokens[$i];
-        return true;
-        }
-    else
-        {
-        return false;
-        }
-    }    
+	{
+	//check condition and advance pointer
+	if (preg_match($regex, $next))
+		{
+		$i++;
+		$next = $tokens[$i];
+		return true;
+		}
+	else
+		{
+		return false;
+		}
+	}	
  
 function token(&$tokens, $next ,$i, &$n, &$message)
-    {
-    //comes from a NOT
-    if (advance("/[^&!\|\(\)\\n]/", $next, $i, $tokens))
-        {
-	//pointer is a token
-        operator($tokens, $next ,$i, $n, $message); 
-        }
-    elseif (advance("/!{1}/", $next, $i, $tokens))
-        {
-	//pointer is a NOT
-        token($tokens, $next ,$i, $n, $message);   
-        }
-    else
-        {
-	//error found
-        $message = "Error in boolean expression at token " . ($i + 1) . " near " . $next;
-        }
-    }
-    
+	{
+	//comes from a NOT
+	if (advance("/[^&!\|\(\)\\n]/", $next, $i, $tokens))
+		{
+		//pointer is a token
+		operator($tokens, $next ,$i, $n, $message); 
+		}
+	elseif (advance("/!{1}/", $next, $i, $tokens))
+		{
+		//pointer is a NOT
+		token($tokens, $next ,$i, $n, $message);   
+		}
+	else
+		{
+		//error found
+		$message = "Error in boolean expression at token " . ($i + 1) . " near " . $next;
+		}
+	}
+	
 function open(&$tokens,$next,$i,&$n, &$message)
-    {
-    //comes from a NOT or open parenthesis
-    if (advance("/\({1}/", $next, $i, $tokens))
-        {
-	//pointer is open parenthesis
-        $n++;    
-        open($tokens, $next ,$i, $n, $message);
-        }
-    elseif (advance("/!{1}/", $next, $i, $tokens))
-        {
-	//pointer is a NOT
-        open($tokens, $next ,$i, $n, $message);
-        }    
-    elseif (advance("/[^&!\|\(\)\\n]/", $next, $i, $tokens))
-        {
-	//pointer is a token
-        operator($tokens, $next ,$i, $n, $message);
-        }
-    else
-        {
-	//error found
-        $message = "Error in boolean expression at token " . ($i + 1) . " near " . $next;
-        }
-    }
-    
+	{
+	//comes from a NOT or open parenthesis
+	if (advance("/\({1}/", $next, $i, $tokens))
+		{
+		//pointer is open parenthesis
+		$n++;
+		open($tokens, $next ,$i, $n, $message);
+		}
+	elseif (advance("/!{1}/", $next, $i, $tokens))
+		{
+		//pointer is a NOT
+		open($tokens, $next ,$i, $n, $message);
+		}	
+	elseif (advance("/[^&!\|\(\)\\n]/", $next, $i, $tokens))
+		{
+		//pointer is a token
+		operator($tokens, $next ,$i, $n, $message);
+		}
+	else
+		{
+		//error found
+		$message = "Error in boolean expression at token " . ($i + 1) . " near " . $next;
+		}
+	}
+	
 function operator(&$tokens,$next,$i,&$n,&$message)
-    {
-    //comes from closed parenthesis or token
-    if (advance("/[\|&]{1}/", $next, $i, $tokens))
-        {
-	//pointer is an AND, OR or NOT
-        open($tokens, $next ,$i, $n, $message);
-        }
-    elseif (advance("/\){1}/", $next, $i, $tokens))
-        {
-	//pointer is a closed parenthesis
-        $n--;
-        operator($tokens, $next ,$i, $n, $message);
-        }
-    elseif (advance("/[^&!\|\(\)\\n]/", $next, $i, $tokens))
-        {
-	//pointer is a token
-        array_splice($tokens,$i-1,0,"|"); //put an OR between two tokens
-        $i++;
-        operator($tokens, $next ,$i, $n, $message);   
-        }
-    elseif ($next == "\n")
-        {
-	//end of descent, no errors
-        $message = false;  
-        } 
-    else
-        {
-	//error found
-        $message = "Error in boolean expression at token " . ($i + 1) . " near " . $next;
-        }
-    } //end function
+	{
+	//comes from closed parenthesis or token
+	if (advance("/[\|&]{1}/", $next, $i, $tokens))
+		{
+		//pointer is an AND, OR or NOT
+		open($tokens, $next ,$i, $n, $message);
+		}
+	elseif (advance("/\){1}/", $next, $i, $tokens))
+		{
+		//pointer is a closed parenthesis
+		$n--;
+		operator($tokens, $next ,$i, $n, $message);
+		}
+	elseif (advance("/[^&!\|\(\)\\n]/", $next, $i, $tokens))
+		{
+		//pointer is a token
+		array_splice($tokens,$i-1,0,"|"); //put an OR between two tokens
+		$i++;
+		operator($tokens, $next ,$i, $n, $message);   
+		}
+	elseif ($next == "\n")
+		{
+		//end of descent, no errors
+		$message = false;  
+		} 
+	else
+		{
+		//error found
+		$message = "Error in boolean expression at token " . ($i + 1) . " near " . $next;
+		}
+	} //end function
 ?>
