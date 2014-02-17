@@ -87,7 +87,6 @@ function parse_boolean_string(&$boolean_string) {
 		}
 			
 	//SPLICE CONJOINING TOKENS WITH PIPE FOR OR
-	$i = 0; //increment from ! to count of tokens
 	$arr_splice = array();
 	$path = "/[^&!\|\(\)\\n]/";
 	for ($i=1; $i<count($tokens); $i++)
