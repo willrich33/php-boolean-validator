@@ -155,7 +155,7 @@ function not($tokens, &$next, &$i, &$message)
 		}
 	elseif (preg_match("/\({1}/", $next))
 		{
-		//pointer is a token
+		//pointer is an open parenthesis
 		open($tokens, $next ,$i, $message);
 		}	
 	elseif (preg_match("/!{1}/", $next))
