@@ -16,7 +16,7 @@ If not, see http://www.gnu.org/licenses/
 */
 
 # PHP BOOLEAN PARSER INSTRUCTIONS
-#function parse_boolean_string($boolean_string, $boolean_tokens)
+#function parse_boolean_string($boolean_string, optional $boolean_tokens)
 #	{
 #	returns error message or true on error, returns false on successful parse
 #	passes $boolean_string as value, $boolean_string is formatted on success, left unchanged on failure
@@ -41,14 +41,14 @@ echo "<table border=1><tr><td>Boolean String</td><td>Error Message</td></tr>";
 
 foreach ($boolean_test_array as $boolean_string)
 	{
-	$error_message = parse_boolean_string($boolean_string, array());
+	$error_message = parse_boolean_string($boolean_string);
 	echo "<tr><td>" . $boolean_string . "</td><td>" . $error_message . "</td></tr>";	
 	}
 echo "</table>";
 /* END TEST AREA */
 
 /* MAIN FUNCTION */
-function parse_boolean_string(&$boolean_string, &$boolean_tokens) {
+function parse_boolean_string(&$boolean_string, &$boolean_tokens = null) {
 
 	/* CONTAINS FOUR WATERFALL RETURNS */
 	if (trim($boolean_string) == "") 
