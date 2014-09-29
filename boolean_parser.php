@@ -27,6 +27,9 @@ If not, see http://www.gnu.org/licenses/
 $boolean_test_array[] = "((test1 & test2) & test3)";
 $boolean_test_array[] = "((test1 & ) & test2)";
 $boolean_test_array[] = "(test1 & test2) & test3";
+$boolean_test_array[] = "(test1 & test2) & (test3 | test 4)";
+$boolean_test_array[] = "(test1 & test2) & ((test3 | test 4) & test 5)";
+$boolean_test_array[] = "(test1 AND test2) AND ((test3 OR test 4) AND test 5)";
 $boolean_test_array[] = "(test1 & test2) !& test3";
 $boolean_test_array[] = "test1 & test2";
 $boolean_test_array[] = "test1 | & test2";
@@ -43,10 +46,8 @@ foreach ($boolean_test_array as $boolean_string)
 echo "</table>";
 /* END TEST AREA */
 
-?>
-<?php
 /* MAIN FUNCTION */
-function parse_boolean_string(&$boolean_string) {
+function parse_boolean_string(&$boolean_string, &$boolean_tokens) {
 
 	/* CONTAINS FOUR WATERFALL RETURNS */
 	if (trim($boolean_string) == "") 
@@ -58,6 +59,10 @@ function parse_boolean_string(&$boolean_string) {
 	/* TOKENIZE BOOLEAN STRING */
 	//purge unwanted chars
 	$boolean_string = str_replace(array("\r","\n","\t"), "", $boolean_string);
+	//replace plain language boolean with character representation
+	$boolean_string = str_replace(" AND ", " & ", $boolean_string);
+	$boolean_string = str_replace(" OR ", " | ", $boolean_string);
+	$boolean_string = str_replace(" NOT ", " ! ", $boolean_string);
 	//split up tokens and operators
 	$tokens = preg_split('/([\|&!\)\(\s])/', $boolean_string, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 	//get rid of space tokens
@@ -111,17 +116,18 @@ function parse_boolean_string(&$boolean_string) {
 	if (preg_match("/[^&!\|\(\)\\n]/", $next))
 		{
 		//pointer is a token
-		closed($tokens, $next ,$i, $message); 
+		$boolean_tokens[] = $next;
+		closed($tokens, $next ,$i, $message, $boolean_tokens); 
 		}
 	elseif (preg_match("/\({1}/", $next))
 		{
 		//pointer is an open parenthesis
-		open($tokens, $next ,$i, $message);
+		open($tokens, $next ,$i, $message, $boolean_tokens);
 		}	
 	elseif (preg_match("/!{1}/", $next))
 		{
 		//pointer is a NOT
-		not($tokens, $next ,$i, $message);   
+		not($tokens, $next ,$i, $message, $boolean_tokens);   
 		}
 	else
 		{
@@ -133,17 +139,18 @@ function parse_boolean_string(&$boolean_string) {
 		{
 		//return and exit on populated error message
 		return $message;
-		}				
+		}
 	
 	/* SUCCESSFUL PARSE - IMPLODE, TRIM AND RETURN FALSE */
 	//$boolean_string passed as a value, trim off new line
 	$boolean_string = trim(implode($tokens));
+
 	return false;
 	}
 /* END MAIN FUNCTION */
  
 /* RECURSIVE DESCENT PARSING FUNCTIONS */
-function not($tokens, &$next, &$i, &$message)
+function not($tokens, &$next, &$i, &$message, &$boolean_tokens)
 	{
 	//comes from a NOT
 	$i++;
@@ -151,17 +158,18 @@ function not($tokens, &$next, &$i, &$message)
 	if (preg_match("/[^&!\|\(\)\\n]/", $next))
 		{
 		//pointer is a token
-		closed($tokens, $next ,$i, $message); 
+		$boolean_tokens[] = $next;
+		closed($tokens, $next ,$i, $message, $boolean_tokens); 
 		}
 	elseif (preg_match("/\({1}/", $next))
 		{
 		//pointer is an open parenthesis
-		open($tokens, $next ,$i, $message);
+		open($tokens, $next ,$i, $message, $boolean_tokens);
 		}	
 	elseif (preg_match("/!{1}/", $next))
 		{
 		//pointer is a NOT
-		not($tokens, $next ,$i, $message);   
+		not($tokens, $next ,$i, $message, $boolean_tokens);   
 		}
 	else
 		{
@@ -170,7 +178,7 @@ function not($tokens, &$next, &$i, &$message)
 		}
 	}
 	
-function open($tokens, &$next, &$i, &$message)
+function open($tokens, &$next, &$i, &$message, &$boolean_tokens)
 	{
 	//comes from an open parenthesis
 	$i++;
@@ -178,17 +186,18 @@ function open($tokens, &$next, &$i, &$message)
 	if (preg_match("/\({1}/", $next))
 		{
 		//pointer is open parenthesis
-		open($tokens, $next ,$i, $message);
+		open($tokens, $next ,$i, $message, $boolean_tokens);
 		}
 	elseif (preg_match("/!{1}/", $next))
 		{
 		//pointer is a NOT
-		not($tokens, $next ,$i, $message);
+		not($tokens, $next ,$i, $message, $boolean_tokens);
 		}	
 	elseif (preg_match("/[^&!\|\(\)\\n]/", $next))
 		{
 		//pointer is a token
-		closed($tokens, $next ,$i, $message);
+		$boolean_tokens[] = $next;
+		closed($tokens, $next ,$i, $message, $boolean_tokens);
 		}
 	else
 		{
@@ -197,7 +206,7 @@ function open($tokens, &$next, &$i, &$message)
 		}
 	}
 	
-function operator($tokens, &$next, &$i, &$message)
+function operator($tokens, &$next, &$i, &$message, &$boolean_tokens)
 	{
 	//comes from an operator
 	$i++;
@@ -205,17 +214,18 @@ function operator($tokens, &$next, &$i, &$message)
 	if (preg_match("/[^&!\|\(\)\\n]/", $next))
 		{
 		//pointer is a token
-		closed($tokens, $next ,$i, $message);
+		$boolean_tokens[] = $next;
+		closed($tokens, $next ,$i, $message, $boolean_tokens);
 		}
 	elseif (preg_match("/!{1}/", $next))
 		{
 		//pointer is a NOT
-		not($tokens, $next ,$i, $message);   
+		not($tokens, $next ,$i, $message, $boolean_tokens);   
 		}
 	elseif (preg_match("/\({1}/", $next))
 		{
 		//pointer is open parenthesis
-		open($tokens, $next ,$i, $message);
+		open($tokens, $next ,$i, $message, $boolean_tokens);
 		}
 	else
 		{
@@ -224,7 +234,7 @@ function operator($tokens, &$next, &$i, &$message)
 		}
 	}
 	
-function closed($tokens, &$next, &$i, &$message)
+function closed($tokens, &$next, &$i, &$message, &$boolean_tokens)
 	{
 	//comes from closed parenthesis or token
 	$i++;
@@ -232,12 +242,12 @@ function closed($tokens, &$next, &$i, &$message)
 	if (preg_match("/[\|&]{1}/", $next))
 		{
 		//pointer is an operator
-		operator($tokens, $next, $i, $message);
+		operator($tokens, $next, $i, $message, $boolean_tokens);
 		}
 	elseif (preg_match("/\){1}/", $next))
 		{
 		//pointer is a closed
-		closed($tokens, $next, $i, $message);
+		closed($tokens, $next, $i, $message, $boolean_tokens);
 		}
 	elseif ($next == "\n")
 		{
