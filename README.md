@@ -9,4 +9,4 @@ php-boolean-parser
 2014-01-16 -- Fully redid the function making major logical and programming changes<br>
 2013-12-22 -- Changes made to remove notices for PHP 5.4<br>
 2013-11-06 -- Initial upload and get everything going<br>
-2014-09-21 -- </p>
+2014-09-21 -- Added support for plain english boolean commands and for boolean_tokens array</p>
