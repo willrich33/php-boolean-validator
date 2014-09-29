@@ -16,7 +16,7 @@ If not, see http://www.gnu.org/licenses/
 */
 
 # PHP BOOLEAN PARSER INSTRUCTIONS
-#function parse_boolean_string($boolean_string)
+#function parse_boolean_string($boolean_string, $boolean_tokens)
 #	{
 #	returns error message or true on error, returns false on successful parse
 #	passes $boolean_string as value, $boolean_string is formatted on success, left unchanged on failure
@@ -38,9 +38,10 @@ $boolean_test_array[] = "Test1 & !test2)";
 
 echo "<p>PHP BOOLEAN PARSER</p>";
 echo "<table border=1><tr><td>Boolean String</td><td>Error Message</td></tr>";
+
 foreach ($boolean_test_array as $boolean_string)
 	{
-	$error_message = parse_boolean_string($boolean_string);
+	$error_message = parse_boolean_string($boolean_string, array());
 	echo "<tr><td>" . $boolean_string . "</td><td>" . $error_message . "</td></tr>";	
 	}
 echo "</table>";
