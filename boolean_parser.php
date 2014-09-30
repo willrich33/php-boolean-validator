@@ -19,7 +19,9 @@ If not, see http://www.gnu.org/licenses/
 #function parse_boolean_string($boolean_string, optional $boolean_tokens)
 #	{
 #	returns error message or true on error, returns false on successful parse
-#	passes $boolean_string as value, $boolean_string is formatted on success, left unchanged on failure
+#	passes $boolean_string as reference, $boolean_string is formatted on success, left unchanged on failure
+#	passes optional $boolean_takens as reference to collect tokens
+#	returns false on successful parse, error message string on failure
 #	}
 # END INSTRUCTIONS
 
