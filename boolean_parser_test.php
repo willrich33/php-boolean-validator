@@ -32,6 +32,7 @@ If not, see http://www.gnu.org/licenses/
 #    //$boolean_string and $boolean_tokens passed as reference
 #    //$boolean_string will be formatted on success, untouched on error
 #    //$boolean_tokens will be populated with not boolean tokens, partially populated on error
+#    //$error_message is false on successful validation, error string on error
 #    $error_message = $test->parse_boolean_string(string $boolean_string, optional array $boolean_tokens);
 #
 # END INSTRUCTIONS
