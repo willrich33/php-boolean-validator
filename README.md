@@ -16,7 +16,7 @@ php-boolean-parser
 <li>General housekeeping</li>
 <li>Test code separated into separate file</li></ul>
 
-<p>2014-09-21 -- Added support for plain english boolean commands and for boolean_tokens array</p>
+<p>2014-09-21 -- Added support for plain english boolean commands and for boolean_tokens array</br>
 2014-01-16 -- Fully redid the function making major logical and programming changes<br>
 2013-12-22 -- Changes made to remove notices for PHP 5.4<br>
 2013-11-06 -- Initial upload and get everything going<br></p>
