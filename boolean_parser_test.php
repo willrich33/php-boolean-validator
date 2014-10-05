@@ -106,8 +106,6 @@ unset($test);
 unset($boolean_test_array);
 /* END TEST AREA 2 */
 
-echo "<br><br>";
-
 /* TEST AREA 3 */
 $boolean_test_array[] = "((test1 AND test2) AND test3)";
 $boolean_test_array[] = "((test1 AND ) AND test2)";

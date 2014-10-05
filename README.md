@@ -13,6 +13,7 @@ php-boolean-validator
 <li>Support added for any boolean operator tokens scheme</li>
 <li>Toggle flag added for auto-populating ORs</li>
 <li>Redundant procedure removed</li>
+<li>Removed unnecessary parameter</li>
 <li>General housekeeping</li>
 <li>Test code separated into separate file</li></ul>
 
