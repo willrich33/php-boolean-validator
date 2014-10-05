@@ -10,3 +10,12 @@ php-boolean-parser
 2013-12-22 -- Changes made to remove notices for PHP 5.4<br>
 2013-11-06 -- Initial upload and get everything going<br>
 2014-09-21 -- Added support for plain english boolean commands and for boolean_tokens array</p>
+
+<p>2014-10-05 -- Major changes -- Basically Version 2</p>
+<ul><li>Project renamed to php-boolean-validator</li>
+<li>Turned into an object</li>
+<li>Support added for any boolean operator tokens scheme</li>
+<li>Toggle flag added for auto-populating ORs</li>
+<li>Redundant procedure removed</li>
+<li>General housekeeping</li>
+<li>Test code separated into separate file</li></ul>
