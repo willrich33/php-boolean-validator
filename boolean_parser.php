@@ -158,8 +158,8 @@ class php_boolean_validator {
         
             return false;
             }    
-        }            
-     /* END MAIN FUNCTION */
+    }            
+    /* END MAIN FUNCTION */
     
     /* SUBSTITUTION CALLBACK */
     protected function substitute(&$item, $key, $arr)
