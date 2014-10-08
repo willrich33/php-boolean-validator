@@ -114,16 +114,11 @@ class php_boolean_validator {
             $boolean_tokens[] = $next;
             $this->closed($tokens, $i, $error, $boolean_tokens); 
             }
-        elseif (in_array($next, array("(")))
+        elseif (in_array($next, array("(","!")))
             {
             //pointer is an open parenthesis
             $this->open($tokens, $i, $error, $boolean_tokens);
             }	
-        elseif (in_array($next, array("!")))
-            {
-            //pointer is a NOT
-            $this->not($tokens, $i, $error, $boolean_tokens);   
-            }
         else
             {
             //bad start
@@ -141,7 +136,7 @@ class php_boolean_validator {
             {
             /* ERROR IN EXPRESSION */
             $position = $error[0]+1;
-            if ($key = array_search($next, $boolean_work))
+            if ($key = array_search($error[1], $boolean_work))
                 {
                 $mistake = $boolean_parse[$key];
                 }
@@ -167,7 +162,7 @@ class php_boolean_validator {
      /* END MAIN FUNCTION */
     
     /* SUBSTITUTION CALLBACK */
-    function substitute(&$item, $key, $arr)
+    protected function substitute(&$item, $key, $arr)
         {
         //for substituting boolean tokens
         $key = array_search($item, $arr['from']);
@@ -178,7 +173,7 @@ class php_boolean_validator {
         }
      
     /* RECURSIVE DESCENT PARSING FUNCTIONS */
-    function open($tokens, &$i, &$error, &$boolean_tokens)
+    protected function open($tokens, &$i, &$error, &$boolean_tokens)
         {
         //comes from an open parenthesis or not
         $i++;
@@ -201,7 +196,7 @@ class php_boolean_validator {
             }
         }
         
-    function operator($tokens, &$i, &$error, &$boolean_tokens)
+    protected function operator($tokens, &$i, &$error, &$boolean_tokens)
         {
         //comes from an operator
         $i++;
@@ -224,7 +219,7 @@ class php_boolean_validator {
             }
         }
         
-    function closed($tokens, &$i, &$error, &$boolean_tokens)
+    protected function closed($tokens, &$i, &$error, &$boolean_tokens)
         {
         //comes from closed parenthesis or token
         $i++;
