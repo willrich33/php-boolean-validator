@@ -149,7 +149,7 @@ class php_boolean_validator {
         else
             {
             /* SUBSTITUTE RETURN FORMAT */
-            $arr_callback = array('to'=>$boolean_return,'from'=>$boolean_work);
+            $arr_callback = array('from'=>$boolean_work,'to'=>$boolean_return);
             array_walk($tokens, array($this, 'substitute'), $arr_callback);
             
             /* SUCCESSFUL PARSE - IMPLODE, TRIM AND RETURN FALSE */
