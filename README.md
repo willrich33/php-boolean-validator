@@ -7,6 +7,8 @@ php-boolean-validator
 
 <p>Change Log</p>
 
+<p>2014-10-08 -- Fixed 2 critical bugs</p>
+
 <p>2014-10-05 -- Major changes -- Basically Version 2</p>
 <ul><li>Project renamed to php-boolean-validator</li>
 <li>Turned into an object</li>
