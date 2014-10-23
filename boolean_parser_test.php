@@ -60,7 +60,7 @@ $test = new php_boolean_validator();
 $test->splice_or_tokens = true;
 
 echo "<p>PHP BOOLEAN VALIDATOR TEST 1</p>";
-echo "<p>Original functionality to check a Postgres full text search input boolean expression.</p>";
+echo "<p>Original functionality to check a Postgres full text search input boolean expression splicing conjoining tokens with ORs.</p>";
 
 echo "<table border=1><tr><td>Original String</td><td>Tested String</td><td>Error Message</td></tr>";
 
@@ -130,7 +130,7 @@ $test->boolean_parse = array('and'=>' AND ', 'or'=>' OR ', 'not'=>' NOT ','open'
 $test->splice_or_tokens = true;
 
 echo "<p>PHP BOOLEAN VALIDATOR TEST 3</p>";
-echo "<p>This takes word token (AND,OR,NOT) boolean operators and substitutes single tokens (&,|,!) if the parse is successful. Also splices ORs.</p>";
+echo "<p>This takes word token (AND,OR,NOT) boolean operators and parses them. Also splices ORs.</p>";
 
 echo "<table border=1><tr><td>Original String</td><td>Tested String</td><td>Error Message</td></tr>";
 
@@ -146,7 +146,7 @@ unset($boolean_test_array);
 /* TEST AREA 3 */
 
 /* TEST AREA 4 */
-$boolean_test_array[] = "((test1 AND test2) AND test3)";
+$boolean_test_array[] = "((test1 AND test2) AND ||)";
 $boolean_test_array[] = "((test1 AND ) AND test2)";
 $boolean_test_array[] = "(test1 test2) AND test3";
 $boolean_test_array[] = "(test1 AND test2) AND (test3 OR test 4)";

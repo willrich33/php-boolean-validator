@@ -26,6 +26,7 @@ class php_boolean_validator {
         $error_unbalanced = "Search term(s) have unbalanced parenthesis";
         $error_expression = "Error in boolean expression at token %s near %s";
         $error_ending = "Unexpected end of boolean expression";
+        $error_output = "Tokens contain boolean output value to be substituted";
         
         /* DO NOT SPLICE ORS DEFAULT */
         $this->splice_or_tokens = isset($this->splice_or_tokens) ? $this->splice_or_tokens : false; 
@@ -40,30 +41,28 @@ class php_boolean_validator {
         /* GET IN AND OUT FORMATS */
         $boolean_work = array('and'=>'&', 'or'=>'|', 'not'=>'!','open'=>'(','closed'=>')');
         $boolean_parse = (isset($this->boolean_parse)) ? $this->boolean_parse : $boolean_work;
-        $boolean_return = (isset($this->boolean_return)) ? $this->boolean_return : $boolean_work;
+        $boolean_return = (isset($this->boolean_return)) ? $this->boolean_return : $boolean_parse;
         
         /* TOKENIZE BOOLEAN STRING */
         //purge unwanted chars
         $boolean_string = str_replace(array("\r","\n","\t"), "", $boolean_string);
         //get regex to parse on
-        $booleans = implode("|", array_map('preg_quote', $boolean_parse)) . "|\s";
+        $booleans_regex = implode("|", array_map('preg_quote', $boolean_parse)) . "|\s";
         //split up tokens and operators
-        $tokens = preg_split("/(" . $booleans .")/i", $boolean_string, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+        $tokens = preg_split("/(" . $booleans_regex .")/i", $boolean_string, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
         //get rid of space tokens
         $tokens = array_diff($tokens, array(" "));
         //trim everything in case of space problems
         $tokens = array_map('trim',$tokens);
         //trim boolean in for substitution
-        $boolean_parse = array_map('trim',$boolean_parse);
+        $booleans = array_map('trim', $boolean_parse);
+        //add eol for simplicity
+        $booleans['eol'] = "\n";
         //use new line as eol, after trim
         array_push($tokens, "\n");
         //re-increment array
         $tokens = array_merge($tokens);
-        
-        /* SUBSTITUTE SINGULAR BOOLEAN TOKENS */
-        $arr_callback = array('from'=>$boolean_parse, 'to'=>$boolean_work);
-        array_walk($tokens, array($this, 'substitute'), $arr_callback);
-            
+                    
         /* CHECK FOR UNBALANCED PARENTHESIS */
         $i = 0; //count parenthesis
         foreach ($tokens as $token)
@@ -90,7 +89,7 @@ class php_boolean_validator {
             for ($i=1; $i<count($tokens); $i++)
                 {
                 //ajoining tokens
-                if ((!in_array($tokens[$i-1], array("&","|","!","(",")","\n"))) && (!in_array($tokens[$i],  array("&","|","!","(",")","\n"))))
+                if (!in_array($tokens[$i-1], $booleans) && !in_array($tokens[$i], $booleans))
                     {
                     array_push($arr_splice, $i);	
                     }
@@ -98,7 +97,7 @@ class php_boolean_validator {
             $i = 0; //increase of offset when splicing
             foreach ($arr_splice as $key)
                 {
-                array_splice($tokens,$key+$i,0,"|");
+                array_splice($tokens,$key+$i,0,$booleans['or']);
                 $i++;
                 }
             }
@@ -107,22 +106,29 @@ class php_boolean_validator {
         //message and tokens passed by value
         $i = 0;	//token position	
         $next = $tokens[$i];
+        $boolean_tokens = array();
         //deal with first token
-        if (!in_array($next, array("&","|","!","(",")","\n")))
+        if (!in_array($next, $booleans))
             {
             //pointer is a token
             $boolean_tokens[] = $next;
-            $this->closed($tokens, $i, $error, $boolean_tokens); 
+            $this->closed($booleans, $tokens, $i, $error, $boolean_tokens); 
             }
-        elseif (in_array($next, array("(","!")))
+        elseif (in_array($next, array($booleans['open'], $booleans['not'])))
             {
-            //pointer is an open parenthesis
-            $this->open($tokens, $i, $error, $boolean_tokens);
+            //pointer is an open parenthesis or not
+            $this->open($booleans, $tokens, $i, $error, $boolean_tokens);
             }	
         else
             {
             //bad start
             $error = $error_beginning;	
+            }
+        
+        /* CHECK TOKENS FOR EXISTANCE OF OUTPUT SUBSTITUTION TOKENS */        
+        if (count(array_intersect($boolean_return, $boolean_tokens)) > 0)
+            {
+            $error = $error_output;    
             }
         
         /* PROCESS RESULT OF PARSE */
@@ -138,7 +144,7 @@ class php_boolean_validator {
             $position = $error[0]+1;
             if ($key = array_search($error[1], $boolean_work))
                 {
-                $mistake = $boolean_parse[$key];
+                $mistake = $booleans[$key];
                 }
             else
                 {
@@ -148,13 +154,16 @@ class php_boolean_validator {
             }
         else
             {
+            /* UNSET EOL ON GOOD PARSE */
+            array_pop($tokens);    
+            
             /* SUBSTITUTE RETURN FORMAT */
-            $arr_callback = array('from'=>$boolean_work,'to'=>$boolean_return);
+            $arr_callback = array('from'=>$booleans,'to'=>$boolean_return);
             array_walk($tokens, array($this, 'substitute'), $arr_callback);
             
             /* SUCCESSFUL PARSE - IMPLODE, TRIM AND RETURN FALSE */
             //$boolean_string passed as a value, trim off new line        
-            $boolean_string = trim(implode($tokens));
+            $boolean_string = implode($tokens);
         
             return false;
             }    
@@ -173,21 +182,21 @@ class php_boolean_validator {
         }
      
     /* RECURSIVE DESCENT PARSING FUNCTIONS */
-    protected function open($tokens, &$i, &$error, &$boolean_tokens)
+    protected function open($booleans, $tokens, &$i, &$error, &$boolean_tokens)
         {
         //comes from an open parenthesis or not
         $i++;
         $next = $tokens[$i];
-        if (!in_array($next, array("&","|","!","(",")","\n")))
+        if (!in_array($next, $booleans))
             {
             //pointer is a token
             $boolean_tokens[] = $next; //save token
-            $this->closed($tokens, $i, $error, $boolean_tokens);
+            $this->closed($booleans, $tokens, $i, $error, $boolean_tokens);
             }
-        elseif (in_array($next, array("(","!")))
+        elseif (in_array($next, array($booleans['open'], $booleans['not'])))
             {
             //pointer is open parenthesis or not
-            $this->open($tokens, $i, $error, $boolean_tokens);
+            $this->open($booleans, $tokens, $i, $error, $boolean_tokens);
             }
         else
             {
@@ -196,21 +205,21 @@ class php_boolean_validator {
             }
         }
         
-    protected function operator($tokens, &$i, &$error, &$boolean_tokens)
+    protected function operator($booleans, $tokens, &$i, &$error, &$boolean_tokens)
         {
         //comes from an operator
         $i++;
         $next = $tokens[$i];
-        if (!in_array($next, array("&","|","!","(",")","\n")))
+        if (!in_array($next, $booleans))
             {
             //pointer is a token
             $boolean_tokens[] = $next;
-            $this->closed($tokens, $i, $error, $boolean_tokens);
+            $this->closed($booleans, $tokens, $i, $error, $boolean_tokens);
             }
-        elseif (in_array($next, array("(","!")))
+        elseif (in_array($next, array($booleans['open'], $booleans['not'])))
             {
             //pointer is open parenthesis or not
-            $this->open($tokens, $i, $error, $boolean_tokens);
+            $this->open($booleans, $tokens, $i, $error, $boolean_tokens);
             }
         else
             {
@@ -219,20 +228,20 @@ class php_boolean_validator {
             }
         }
         
-    protected function closed($tokens, &$i, &$error, &$boolean_tokens)
+    protected function closed($booleans, $tokens, &$i, &$error, &$boolean_tokens)
         {
         //comes from closed parenthesis or token
         $i++;
         $next = $tokens[$i];
-        if (in_array($next, array("&","|")))
+        if (in_array($next, array($booleans['and'], $booleans['or'])))
             {
             //pointer is an operator
-            $this->operator($tokens, $i, $error, $boolean_tokens);
+            $this->operator($booleans, $tokens, $i, $error, $boolean_tokens);
             }
-        elseif (in_array($next, array(")")))
+        elseif (in_array($next, array($booleans['closed'])))
             {
             //pointer is a closed
-            $this->closed($tokens, $i, $error, $boolean_tokens);
+            $this->closed($booleans, $tokens, $i, $error, $boolean_tokens);
             }
         elseif ($next == "\n")
             {
