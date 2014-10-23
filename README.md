@@ -11,7 +11,7 @@ php-boolean-validator
 
 <p>2014-10-23 -- Fixed bug and changed away from Postgres tokens output default</p>
 <ul><li>Added error for occurrence where tokens exist in output boolean operators. This error can happen when input boolean definition is different than output boolean definition.</li>
-<li>Code now parses on input boolean definition, not Postgres definition when input definition is defined. Will not default output Postgres boolean full text operators.</li></ul>
+<li>Code now parses on input boolean definition, not Postgres definition when input definition is defined. Will not default output Postgres boolean full text operators when input booleans are defined.</li></ul>
 
 <p>2014-10-08 -- Fixed 2 critical bugs</p>
 
