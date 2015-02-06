@@ -122,13 +122,13 @@ class php_boolean_validator {
         else
             {
             //bad start
-            $error = $error_beginning;	
+            return $error_beginning;	
             }
         
         /* CHECK TOKENS FOR EXISTANCE OF OUTPUT SUBSTITUTION TOKENS */        
         if (count(array_intersect($boolean_return, $boolean_tokens)) > 0)
             {
-            $error = $error_output;    
+            return $error_output;    
             }
         
         /* PROCESS RESULT OF PARSE */
@@ -136,21 +136,30 @@ class php_boolean_validator {
         if (is_string($error)) 
             {
             /* BAD BEGINNING OR UNEXPECTED END */
-            return $error;
+            return $error_ending;
             }
         elseif (is_array($error))
             {
             /* ERROR IN EXPRESSION */
-            $position = $error[0]+1;
-            if ($key = array_search($error[1], $boolean_work))
+            if (is_string($error)) 
                 {
-                $mistake = $booleans[$key];
+                /* BAD BEGINNING OR UNEXPECTED END */
+                return $error_ending;
                 }
-            else
+            elseif (is_array($error))
                 {
-                $mistake = $error[1];    
+                /* ERROR IN EXPRESSION */
+                $position = $error[0]+1;
+                if ($key = array_search($error[1], $boolean_work))
+                    {
+                    $mistake = $booleans[$key];
+                    }
+                else
+                    {
+                    $mistake = $error[1];    
+                    }
+                return sprintf($error_expression, $position, $mistake);
                 }
-            return sprintf($error_expression, $position, $mistake);
             }
         else
             {
@@ -162,7 +171,7 @@ class php_boolean_validator {
             array_walk($tokens, array($this, 'substitute'), $arr_callback);
             
             /* SUCCESSFUL PARSE - IMPLODE, TRIM AND RETURN FALSE */
-            //$boolean_string passed as a value, trim off new line        
+            //$boolean_string passed as a value       
             $boolean_string = implode($tokens);
         
             return false;

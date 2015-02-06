@@ -55,6 +55,7 @@ $boolean_test_array[] = "&";
 $boolean_test_array[] = "Test1 & !test2)";
 $boolean_test_array[] = "Test1 & !test2";
 $boolean_test_array[] = "test1 test2 & test3 test4";
+$boolean_test_array[] = "!test1 &";
 
 $test = new php_boolean_validator();
 $test->splice_or_tokens = true;
@@ -89,6 +90,7 @@ $boolean_test_array[] = "&";
 $boolean_test_array[] = "Test1 & !test2)";
 $boolean_test_array[] = "Test1 & !test2";
 $boolean_test_array[] = "test1 test2 & test3 test4";
+$boolean_test_array[] = "!test1 &";
 
 $test = new php_boolean_validator();
 $test->boolean_return = array('and'=>' AND ', 'or'=>' OR ', 'not'=>' NOT ','open'=>'(','closed'=>')');
@@ -124,6 +126,7 @@ $boolean_test_array[] = "AND";
 $boolean_test_array[] = "Test1 AND NOT test2)";
 $boolean_test_array[] = "Test1 AND NOT test2";
 $boolean_test_array[] = "test1 test2 & test3 test4";
+$boolean_test_array[] = "NOT test1 AND";
 
 $test = new php_boolean_validator();
 $test->boolean_parse = array('and'=>' AND ', 'or'=>' OR ', 'not'=>' NOT ','open'=>'(','closed'=>')');
@@ -158,7 +161,8 @@ $boolean_test_array[] = "NOT test1 AND test2";
 $boolean_test_array[] = "AND";
 $boolean_test_array[] = "Test1 AND NOT test2)";
 $boolean_test_array[] = "Test1 AND NOT test2";
-$boolean_test_array[] = "test1 test2 & test3 test4";
+$boolean_test_array[] = "test1 test2 AND test3 test4";
+$boolean_test_array[] = "NOT test1 AND";
 
 $test = new php_boolean_validator();
 $test->boolean_parse = array('and'=>' AND ', 'or'=>' OR ', 'not'=>' NOT ','open'=>'(','closed'=>')');
