@@ -9,7 +9,7 @@ php-boolean-validator
 
 <p>Change Log</p>
 
-<p>2015-02-05 -- Couple of bug delaing with error messages</p>
+<p>2015-02-05 -- Fixed a couple of bugs dealing with error messages</p>
 <ul><li>Fixed the error messages, especially beginning and ending</li>
 <li>Added a test for ending messages </li></ul>
 
