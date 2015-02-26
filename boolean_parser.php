@@ -133,6 +133,8 @@ class php_boolean_validator {
         
         /* PROCESS RESULT OF PARSE */
         //error could be boolean, string, or array
+        //boolean is success
+        /* ERROR IN EXPRESSION */
         if (is_string($error)) 
             {
             /* BAD BEGINNING OR UNEXPECTED END */
@@ -141,25 +143,16 @@ class php_boolean_validator {
         elseif (is_array($error))
             {
             /* ERROR IN EXPRESSION */
-            if (is_string($error)) 
+            $position = $error[0]+1;
+            if ($key = array_search($error[1], $boolean_work))
                 {
-                /* BAD BEGINNING OR UNEXPECTED END */
-                return $error_ending;
+                $mistake = $booleans[$key];
                 }
-            elseif (is_array($error))
+            else
                 {
-                /* ERROR IN EXPRESSION */
-                $position = $error[0]+1;
-                if ($key = array_search($error[1], $boolean_work))
-                    {
-                    $mistake = $booleans[$key];
-                    }
-                else
-                    {
-                    $mistake = $error[1];    
-                    }
-                return sprintf($error_expression, $position, $mistake);
+                $mistake = $error[1];    
                 }
+            return sprintf($error_expression, $position, $mistake);
             }
         else
             {
@@ -176,8 +169,8 @@ class php_boolean_validator {
         
             return false;
             }    
-    }            
-    /* END MAIN FUNCTION */
+        }            
+        /* END MAIN FUNCTION */
     
     /* SUBSTITUTION CALLBACK */
     protected function substitute(&$item, $key, $arr)
